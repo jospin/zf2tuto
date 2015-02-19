@@ -3,13 +3,16 @@ return array(
     # definir e gerenciar controllers
     'controllers' => array(
         'invokables' => array(
-            'HomeController' => 'Contato\Controller\HomeController'
+            'HomeController' => 'Contato\Controller\HomeController',
+            'ContatoController'    => 'Contato\Controller\ContatoController',
         ),
     ),
 
     # definir e gerenciar rotas
     'router' => array(
         'routes' => array(
+
+            # literal para action Index home
             'home' => array(
                 'type'      => 'Literal',
                 'options'   => array(
@@ -20,6 +23,34 @@ return array(
                     ),
                 ),
             ),
+
+            # literal para action sobre home
+            'sobre' => array(
+                'type'      => 'Literal',
+                'options'   => array(
+                    'route'    => '/sobre',
+                    'defaults' => array(
+                        'controller' => 'HomeController',
+                        'action'     => 'sobre',
+                    ),
+                ),
+            ),
+
+            'contatos' => array(
+                'type'      => 'Segment',
+                'options'   => array(
+                    'route'    => '/contato[/:action][/:id]',
+                    'constraints' => array(
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'ContatoController',
+                        'action'     => 'index',
+                    ),
+                ),
+            ),
+
         ),
     ),
 
