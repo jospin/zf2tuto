@@ -7,7 +7,6 @@
  */
 return array(
     'modules' => array(
-        'Application',
         'Contato'
     ),
     'module_listener_options' => array(
