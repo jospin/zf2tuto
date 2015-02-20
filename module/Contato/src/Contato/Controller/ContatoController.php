@@ -2,15 +2,27 @@
 
 namespace Contato\Controller;
 
+// Import Zed\MVC
 use Zend\Mvc\Controller\AbstractActionController;
+
+// Import Zed\View
 use Zend\View\Model\ViewModel;
+// imort ModelContatoTable com alias
+use Contato\Model\ContatoTable as ModelContato;
 
 class ContatoController extends AbstractActionController
 {
 
     public function indexAction()
     {
-        return new ViewModel();
+        // localizar adapter do banco
+        $adapter = $this->getServiceLocator()->get('AdapterDb');
+
+        // model ContatoTable instanciado
+        $modelContato = new ModelContato($adapter); // alias para ContatoTable
+
+        // enviar para view o array com key contatos e value com todos os contatos
+        return new ViewModel(array('contatos' => $modelContato->fetchAll()));
     }
 
     public function novoAction()
@@ -49,7 +61,6 @@ class ContatoController extends AbstractActionController
         }
     }
 
-    // GET /contatos/detalhes/id
     public function detalhesAction()
     {
         // filtra id passsado pela url
@@ -64,21 +75,25 @@ class ContatoController extends AbstractActionController
             return $this->redirect()->toRoute('contatos');
         }
 
-        // aqui vai a lógica para pegar os dados referente ao contato
-        // 1 - solicitar serviço para pegar o model responsável pelo find
-        // 2 - solicitar form com dados desse contato encontrado
-        // formulário com dados preenchidos
-        $form = array(
-            'nome' => 'Igor Rocha',
-            "telefone_principal" => "(085) 8585-8585",
-            "telefone_secundario" => "(085) 8585-8585",
-            "data_criacao" => "02/03/2013",
-            "data_atualizacao" => "02/03/2013",
-        );
+        // localizar adapter do banco
+        $adapter = $this->getServiceLocator()->get('AdapterDb');
+
+        // model ContatoTable instanciado
+        $modelContato = new ModelContato($adapter); // alias para ContatoTable
+        try {
+            $form = (array) $modelContato->find($id);
+        } catch (Exception $exc) {
+            // adicionar mensagem
+            $this->flashMessenger()->addErrorMessage($exc->getMessage());
+
+            // redirecionar para action index
+            return $this->redirect()->toRoute('contatos');
+        }
 
         // dados eviados para detalhes.phtml
         return array('id' => $id, 'form' => $form);
     }
+
 
     // GET /contatos/editar/id
     public function editarAction()
@@ -95,16 +110,20 @@ class ContatoController extends AbstractActionController
             return $this->redirect()->toRoute('contatos');
         }
 
-        // aqui vai a lógica para pegar os dados referente ao contato
-        // 1 - solicitar serviço para pegar o model responsável pelo find
-        // 2 - solicitar form com dados desse contato encontrado
+        // localizar adapter do banco
+        $adapter = $this->getServiceLocator()->get('AdapterDb');
 
-        // formulário com dados preenchidos
-        $form = array(
-            'nome'                  => 'Igor Rocha',
-            "telefone_principal"    => "(085) 8585-8585",
-            "telefone_secundario"   => "(085) 8585-8585",
-        );
+        // model ContatoTable instanciado
+        $modelContato = new ModelContato($adapter); // alias para ContatoTable
+        try {
+            $form = (array) $modelContato->find($id);
+        } catch (Exception $exc) {
+            // adicionar mensagem
+            $this->flashMessenger()->addErrorMessage($exc->getMessage());
+
+            // redirecionar para action index
+            return $this->redirect()->toRoute('contatos');
+        }
 
         // dados eviados para editar.phtml
         return array('id' => $id, 'form' => $form);
